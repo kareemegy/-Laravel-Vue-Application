@@ -89,16 +89,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="#" class="nav-link ">
-                    <i class="far fa-circle nav-icon purple"></i>
-                    <p>Active Page</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="#" class="nav-link">
-                    <i class="far fa-circle nav-icon pink"></i>
-                    <p>Inactive Page</p>
-                  </a>
+                  <router-link to="/user" class="nav-link" active-class="active">
+                    <i class="fas fa-users nav-icon purple"></i>
+                    <p>Users Page</p>
+                  </router-link>
                 </li>
               </ul>
             </li>
