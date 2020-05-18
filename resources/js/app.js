@@ -16,7 +16,7 @@ let routes = [
         component: require("./components/Dashboard.vue").default
     },
     {
-        path: "/profile",
+        path: "/profile",   
         component: require("./components/Profile.vue").default
     }
 ];
