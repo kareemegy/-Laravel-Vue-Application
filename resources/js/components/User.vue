@@ -30,20 +30,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                </tr>
-                                <tr v-for="user in users.data" :key="user.id" >
-                                    <td>{{user.id}}</td>
-                                    <td>{{user.name}}</td>
-                                    <td>{{user.email}}</td>
-                                    <td>{{user.type}}</td>
-                                    <td>{{user.created_at}}</td>
-                                    <td>{{user.bio}}</td>
-                                    <!-- <td>
-                                        <span class="tag tag-success"
-                                            >Approved</span
-                                        >
-                                    </td> -->
+                                <tr v-for="user in users.data" :key="user.id">
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.type | upText }}</td>
+                                    <td>{{ user.created_at | myDate }}</td>
+                                    <td>{{ user.bio }}</td>
                                     <td>
                                         <a href="#">
                                             <i class="fa fa-edit blue"></i>
@@ -184,6 +177,7 @@
                             >
                                 Close
                             </button>
+
                             <button type="submit" class="btn btn-primary">
                                 Create
                             </button>
@@ -216,15 +210,32 @@ export default {
     },
     methods: {
         rest() {
-            {
-                this.form.reset();
-            }
+            this.form.reset();
         },
         createUser() {
+            this.$Progress.start();
             this.form.post("api/user");
+            $("#usermodal").modal("hide");
+            this.loadUsers();
+            this.rest();
+            this.$Progress.finish();
+            this.showUserToast("user is created");
         },
         loadUsers() {
-            axios.get("api/user").then(data => (this.users = data.data));
+            axios.get("api/user").then(data => {
+                this.users = data.data;
+            });
+        },
+        showUserToast(text) {
+            this.$swal({
+                toast: true,
+                title: text,
+                icon: "success",
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
         }
     }
 };

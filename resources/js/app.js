@@ -4,16 +4,27 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require("./bootstrap");
-
-window.Vue = require("vue");
-import { Form, HasError, AlertError } from 'vform'
-
-window.Form = Form;
-Vue.component(HasError.name, HasError)
-Vue.component(AlertError.name, AlertError)
 import VueRouter from "vue-router";
+import { Form, HasError, AlertError } from "vform";
+import Moment from "moment";
+import VueProgressBar from "vue-progressbar";
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+
+require("./bootstrap");
+window.Vue = require("vue");
+window.Form = Form;
+
+Vue.component(HasError.name, HasError);
+Vue.component(AlertError.name, AlertError);
 Vue.use(VueRouter);
+Vue.use(VueProgressBar, {
+    color: "rgb(143, 255, 199)",
+    failedColor: "red",
+    height: "2px"
+});
+
+Vue.use(VueSweetalert2);
 
 let routes = [
     {
@@ -21,23 +32,27 @@ let routes = [
         component: require("./components/Dashboard.vue").default
     },
     {
-        path: "/profile",   
+        path: "/profile",
         component: require("./components/Profile.vue").default
     },
     {
-        path: "/user",   
+        path: "/user",
         component: require("./components/User.vue").default
     }
 ];
 
 const router = new VueRouter({
-    mode:'history',
+    mode: "history",
     routes // short for `routes: routes`
-  })
-  
+});
 
+Vue.filter("upText", function(text) {
+    return text.toUpperCase();
+});
 
-
+Vue.filter("myDate", function(created) {
+    return Moment(created).format("MMMM Do YYYY");
+});
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
