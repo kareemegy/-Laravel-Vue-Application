@@ -25,19 +25,25 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Type</th>
-                                    <th>Modify</th>
+                                    <th>Created At</th>
+                                    <th>bio</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>183</td>
-                                    <td>John Doe</td>
-                                    <td>11-7-2014</td>
-                                    <td>
+                                </tr>
+                                <tr v-for="user in users.data" :key="user.id" >
+                                    <td>{{user.id}}</td>
+                                    <td>{{user.name}}</td>
+                                    <td>{{user.email}}</td>
+                                    <td>{{user.type}}</td>
+                                    <td>{{user.created_at}}</td>
+                                    <td>{{user.bio}}</td>
+                                    <!-- <td>
                                         <span class="tag tag-success"
                                             >Approved</span
                                         >
-                                    </td>
+                                    </td> -->
                                     <td>
                                         <a href="#">
                                             <i class="fa fa-edit blue"></i>
@@ -79,19 +85,110 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body"><p>so u wanna create a  new user?!</p></div>
-                    <div class="modal-footer">
-                        <button
-                            type="submit"
-                            class="btn btn-danger"
-                            data-dismiss="modal"
-                        >
-                            Close
-                        </button>
-                        <button type="button" class="btn btn-primary">
-                            Create
-                        </button>
-                    </div>
+                    <!-- modal body -->
+                    <form @submit.prevent="createUser">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input
+                                    v-model="form.name"
+                                    type="text"
+                                    name="name"
+                                    class="form-control"
+                                    placeholder="name"
+                                    :class="{
+                                        'is-invalid': form.errors.has('name')
+                                    }"
+                                />
+                                <has-error
+                                    :form="form"
+                                    field="name"
+                                ></has-error>
+                            </div>
+                            <div class="form-group">
+                                <input
+                                    v-model="form.email"
+                                    type="email"
+                                    name="email"
+                                    class="form-control"
+                                    placeholder="email"
+                                    :class="{
+                                        'is-invalid': form.errors.has('email')
+                                    }"
+                                />
+                                <has-error
+                                    :form="form"
+                                    field="email"
+                                ></has-error>
+                            </div>
+                            <div class="form-group">
+                                <textarea
+                                    v-model="form.bio"
+                                    type="text"
+                                    name="bio"
+                                    class="form-control"
+                                    placeholder="bio"
+                                    :class="{
+                                        'is-invalid': form.errors.has('bio')
+                                    }"
+                                />
+                                <has-error :form="form" field="bio"></has-error>
+                            </div>
+                            <div class="form-group">
+                                <select
+                                    v-model="form.type"
+                                    type="text"
+                                    name="type"
+                                    class="form-control"
+                                    placeholder="type"
+                                    :class="{
+                                        'is-invalid': form.errors.has('type')
+                                    }"
+                                >
+                                    <option value="">Select User Role</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="user">Standard</option>
+                                    <option value="author">author</option>
+                                </select>
+                                <has-error
+                                    :form="form"
+                                    field="type"
+                                ></has-error>
+                            </div>
+                            <div class="form-group">
+                                <input
+                                    v-model="form.password"
+                                    type="text"
+                                    name="bio"
+                                    class="form-control"
+                                    placeholder="password"
+                                    :class="{
+                                        'is-invalid': form.errors.has(
+                                            'password'
+                                        )
+                                    }"
+                                />
+                                <has-error
+                                    :form="form"
+                                    field="password"
+                                ></has-error>
+                            </div>
+                        </div>
+                        <!-- end modal body -->
+
+                        <div class="modal-footer">
+                            <button
+                                type="submit"
+                                class="btn btn-danger"
+                                data-dismiss="modal"
+                                @click="rest"
+                            >
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Create
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -101,8 +198,34 @@
 
 <script>
 export default {
-    mounted() {
-        console.log("Component mounted.");
+    data() {
+        return {
+            users: {},
+            form: new Form({
+                name: "",
+                email: "",
+                password: "",
+                type: "",
+                bio: "",
+                photo: ""
+            })
+        };
+    },
+    created() {
+        this.loadUsers();
+    },
+    methods: {
+        rest() {
+            {
+                this.form.reset();
+            }
+        },
+        createUser() {
+            this.form.post("api/user");
+        },
+        loadUsers() {
+            axios.get("api/user").then(data => (this.users = data.data));
+        }
     }
 };
 </script>
