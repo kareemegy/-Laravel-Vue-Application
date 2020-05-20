@@ -2216,10 +2216,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       users: {},
+      editmode: null,
+      passwordMSG: null,
+      editUserID: null,
       form: new Form({
         name: "",
         email: "",
@@ -2234,23 +2245,85 @@ __webpack_require__.r(__webpack_exports__);
     this.loadUsers();
   },
   methods: {
-    rest: function rest() {
+    editUserModal: function editUserModal(user) {
+      this.editmode = true;
+      this.reset();
+      $("#usermodal").modal("show");
+      this.form.fill(user);
+      this.editUserID = user.id;
+      this.passwordMSG = "change password optionally :)";
+    },
+    createUserModal: function createUserModal() {
+      this.editmode = false;
+      this.reset();
+      $("#usermodal").modal("show");
+      this.passwordMSG = "password";
+    },
+    reset: function reset() {
       this.form.reset();
+      this.form.clear();
     },
     createUser: function createUser() {
-      this.$Progress.start();
-      this.form.post("api/user");
-      $("#usermodal").modal("hide");
-      this.loadUsers();
-      this.rest();
-      this.$Progress.finish();
-      this.showUserToast("user is created");
-    },
-    loadUsers: function loadUsers() {
       var _this = this;
 
+      this.$Progress.start();
+      this.form.post("api/user").then(function () {
+        $("#usermodal").modal("hide");
+
+        _this.loadUsers();
+
+        _this.reset();
+
+        _this.$Progress.finish();
+
+        _this.showUserToast("user is created");
+      })["catch"](function () {
+        _this.$Progress.finish();
+      });
+    },
+    editUser: function editUser(editUserID) {
+      var _this2 = this;
+
+      this.$Progress.start();
+      this.form.put("api/user/".concat(editUserID)).then(function (res) {
+        console.log(res);
+
+        _this2.loadUsers();
+
+        $("#usermodal").modal("hide");
+
+        _this2.reset();
+
+        _this2.$Progress.finish();
+
+        _this2.showUserToast("user is edited");
+      })["catch"](function (error) {
+        console.log(error);
+
+        _this2.$Progress.finish();
+      });
+    },
+    loadUsers: function loadUsers() {
+      var _this3 = this;
+
       axios.get("api/user").then(function (data) {
-        _this.users = data.data;
+        _this3.users = data.data;
+      });
+    },
+    deleteUser: function deleteUser(userID) {
+      var _this4 = this;
+
+      this.$Progress.start();
+      axios["delete"]("api/user/".concat(userID)).then(function (res) {
+        console.log(res);
+
+        _this4.loadUsers();
+
+        _this4.$Progress.finish();
+      })["catch"](function (erro) {
+        console.log(erro);
+
+        _this4.$Progress.finish();
       });
     },
     showUserToast: function showUserToast(text) {
@@ -2262,6 +2335,25 @@ __webpack_require__.r(__webpack_exports__);
         showConfirmButton: false,
         timer: 1500,
         timerProgressBar: true
+      });
+    },
+    deleteUserAlert: function deleteUserAlert(userID) {
+      var _this5 = this;
+
+      this.$swal({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      }).then(function (result) {
+        if (result.value) {
+          _this5.deleteUser(userID);
+
+          _this5.$swal.fire("Deleted!", "Your file has been deleted.", "success");
+        }
       });
     }
   }
@@ -63604,11 +63696,27 @@ var render = function() {
     _c("div", { staticClass: "row mt-5" }, [
       _c("div", { staticClass: "col-12" }, [
         _c("div", { staticClass: "card" }, [
-          _vm._m(0),
+          _c("div", { staticClass: "card-header" }, [
+            _c("h3", { staticClass: "card-title" }, [_vm._v("Users Table")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-tools" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-success",
+                  on: { click: _vm.createUserModal }
+                },
+                [
+                  _vm._v("\n                            Add New "),
+                  _c("i", { staticClass: "fa fa-user-plus fa-fw" })
+                ]
+              )
+            ])
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "card-body table-responsive p-0" }, [
             _c("table", { staticClass: "table table-hover text-nowrap" }, [
-              _vm._m(1),
+              _vm._m(0),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -63628,7 +63736,33 @@ var render = function() {
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(user.bio))]),
                     _vm._v(" "),
-                    _vm._m(2, true)
+                    _c("td", [
+                      _c(
+                        "a",
+                        {
+                          attrs: { href: "#" },
+                          on: {
+                            click: function($event) {
+                              return _vm.editUserModal(user)
+                            }
+                          }
+                        },
+                        [_c("i", { staticClass: "fa fa-edit blue" })]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "a",
+                        {
+                          attrs: { href: "#" },
+                          on: {
+                            click: function($event) {
+                              return _vm.deleteUserAlert(user.id)
+                            }
+                          }
+                        },
+                        [_c("i", { staticClass: "fa fa-trash red" })]
+                      )
+                    ])
                   ])
                 }),
                 0
@@ -63660,7 +63794,19 @@ var render = function() {
           },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(3),
+              _c("div", { staticClass: "modal-header" }, [
+                _c("h5", {
+                  staticClass: "modal-title",
+                  attrs: { id: "userModalLabel" },
+                  domProps: {
+                    textContent: _vm._s(
+                      _vm.editmode ? "Update new user" : "  Add New User"
+                    )
+                  }
+                }),
+                _vm._v(" "),
+                _vm._m(1)
+              ]),
               _vm._v(" "),
               _c(
                 "form",
@@ -63668,7 +63814,9 @@ var render = function() {
                   on: {
                     submit: function($event) {
                       $event.preventDefault()
-                      return _vm.createUser($event)
+                      _vm.editmode
+                        ? _vm.editUser(_vm.editUserID)
+                        : _vm.createUser()
                     }
                   }
                 },
@@ -63883,8 +64031,8 @@ var render = function() {
                           },
                           attrs: {
                             type: "text",
-                            name: "bio",
-                            placeholder: "password"
+                            name: "password",
+                            placeholder: _vm.passwordMSG
                           },
                           domProps: { value: _vm.form.password },
                           on: {
@@ -63915,7 +64063,7 @@ var render = function() {
                       {
                         staticClass: "btn btn-danger",
                         attrs: { type: "submit", "data-dismiss": "modal" },
-                        on: { click: _vm.rest }
+                        on: { click: _vm.reset }
                       },
                       [
                         _vm._v(
@@ -63924,18 +64072,15 @@ var render = function() {
                       ]
                     ),
                     _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: { type: "submit" }
-                      },
-                      [
-                        _vm._v(
-                          "\n                            Create\n                        "
-                        )
-                      ]
-                    )
+                    _c("button", {
+                      class: _vm.editmode
+                        ? " btn btn-success"
+                        : " btn btn-primary",
+                      attrs: { type: "submit" },
+                      domProps: {
+                        textContent: _vm._s(_vm.editmode ? "Update" : "Create")
+                      }
+                    })
                   ])
                 ]
               )
@@ -63947,28 +64092,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-header" }, [
-      _c("h3", { staticClass: "card-title" }, [_vm._v("Users Table")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-tools" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-success",
-            attrs: { "data-toggle": "modal", "data-target": "#usermodal" }
-          },
-          [
-            _vm._v("\n                            Add New "),
-            _c("i", { staticClass: "fa fa-user-plus fa-fw" })
-          ]
-        )
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -63993,40 +64116,18 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("a", { attrs: { href: "#" } }, [
-        _c("i", { staticClass: "fa fa-edit blue" })
-      ]),
-      _vm._v(" "),
-      _c("a", { attrs: { href: "#" } }, [
-        _c("i", { staticClass: "fa fa-trash red" })
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-header" }, [
-      _c(
-        "h5",
-        { staticClass: "modal-title", attrs: { id: "userModalLabel" } },
-        [_vm._v("\n                        Add New User\n                    ")]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "close",
-          attrs: {
-            type: "button",
-            "data-dismiss": "modal",
-            "aria-label": "Close"
-          }
-        },
-        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-      )
-    ])
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "modal",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
   }
 ]
 render._withStripped = true
@@ -79232,7 +79333,7 @@ Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]);
 Vue.use(vue_progressbar__WEBPACK_IMPORTED_MODULE_3___default.a, {
   color: "rgb(143, 255, 199)",
   failedColor: "red",
-  height: "2px"
+  height: "5px"
 });
 Vue.use(vue_sweetalert2__WEBPACK_IMPORTED_MODULE_4__["default"]);
 var routes = [{

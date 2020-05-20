@@ -5,13 +5,8 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Users Table</h3>
-
                         <div class="card-tools">
-                            <button
-                                class="btn btn-success"
-                                data-toggle="modal"
-                                data-target="#usermodal"
-                            >
+                            <button class="btn btn-success" @click="createUserModal">
                                 Add New <i class="fa fa-user-plus fa-fw"></i>
                             </button>
                         </div>
@@ -38,10 +33,13 @@
                                     <td>{{ user.created_at | myDate }}</td>
                                     <td>{{ user.bio }}</td>
                                     <td>
-                                        <a href="#">
+                                        <a href="#" @click="editUserModal(user)">
                                             <i class="fa fa-edit blue"></i>
                                         </a>
-                                        <a href="#">
+                                        <a
+                                            href="#"
+                                            @click="deleteUserAlert(user.id)"
+                                        >
                                             <i class="fa fa-trash red"></i>
                                         </a>
                                     </td>
@@ -66,9 +64,13 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="userModalLabel">
-                            Add New User
-                        </h5>
+                        <h5
+                            class="modal-title"
+                            id="userModalLabel"
+                            v-text="
+                                editmode ? 'Update new user' : '  Add New User'
+                            "
+                        ></h5>
                         <button
                             type="button"
                             class="close"
@@ -79,7 +81,11 @@
                         </button>
                     </div>
                     <!-- modal body -->
-                    <form @submit.prevent="createUser">
+                    <form
+                        @submit.prevent="
+                            editmode ? editUser(editUserID) : createUser()
+                        "
+                    >
                         <div class="modal-body">
                             <div class="form-group">
                                 <input
@@ -151,9 +157,9 @@
                                 <input
                                     v-model="form.password"
                                     type="text"
-                                    name="bio"
+                                    name="password"
                                     class="form-control"
-                                    placeholder="password"
+                                    :placeholder="passwordMSG"
                                     :class="{
                                         'is-invalid': form.errors.has(
                                             'password'
@@ -173,14 +179,16 @@
                                 type="submit"
                                 class="btn btn-danger"
                                 data-dismiss="modal"
-                                @click="rest"
+                                @click="reset"
                             >
                                 Close
                             </button>
 
-                            <button type="submit" class="btn btn-primary">
-                                Create
-                            </button>
+                            <button
+                                type="submit"
+                                :class="editmode ?' btn btn-success':' btn btn-primary'"
+                                v-text="editmode ? 'Update' : 'Create'"
+                            ></button>
                         </div>
                     </form>
                 </div>
@@ -195,6 +203,9 @@ export default {
     data() {
         return {
             users: {},
+            editmode: null,
+            passwordMSG: null,
+            editUserID: null,
             form: new Form({
                 name: "",
                 email: "",
@@ -205,26 +216,78 @@ export default {
             })
         };
     },
-    created() {
+    created() { 
         this.loadUsers();
     },
     methods: {
-        rest() {
+        editUserModal(user) {
+            this.editmode = true;
+            this.reset();
+            $("#usermodal").modal("show");
+            this.form.fill(user);
+            this.editUserID = user.id;
+            this.passwordMSG = "change password optionally :)";
+        },
+        createUserModal() {
+            this.editmode = false;
+            this.reset();
+            $("#usermodal").modal("show");
+            this.passwordMSG = "password";
+        },
+        reset() {
             this.form.reset();
+            this.form.clear();
         },
         createUser() {
             this.$Progress.start();
-            this.form.post("api/user");
-            $("#usermodal").modal("hide");
-            this.loadUsers();
-            this.rest();
-            this.$Progress.finish();
-            this.showUserToast("user is created");
+            this.form
+                .post("api/user")
+                .then(() => {
+                    $("#usermodal").modal("hide");
+                    this.loadUsers();
+                    this.reset();
+                    this.$Progress.finish();
+                    this.showUserToast("user is created");
+                })
+                .catch(() => {
+                    this.$Progress.finish();
+                });
+        },
+        editUser(editUserID) {
+            this.$Progress.start();
+            this.form
+                .put(`api/user/${editUserID}`)
+                .then(res => {
+                    console.log(res);
+                    this.loadUsers();
+                    $("#usermodal").modal("hide");
+                    this.reset();
+                    this.$Progress.finish();
+                    this.showUserToast("user is edited");
+                })
+                .catch(error => {
+                    console.log(error);
+                    this.$Progress.finish();
+                });
         },
         loadUsers() {
             axios.get("api/user").then(data => {
                 this.users = data.data;
             });
+        },
+        deleteUser(userID) {
+            this.$Progress.start();
+            axios
+                .delete(`api/user/${userID}`)
+                .then(res => {
+                    console.log(res);
+                    this.loadUsers();
+                    this.$Progress.finish();
+                })
+                .catch(erro => {
+                    console.log(erro);
+                    this.$Progress.finish();
+                });
         },
         showUserToast(text) {
             this.$swal({
@@ -235,6 +298,26 @@ export default {
                 showConfirmButton: false,
                 timer: 1500,
                 timerProgressBar: true
+            });
+        },
+        deleteUserAlert(userID) {
+            this.$swal({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then(result => {
+                if (result.value) {
+                    this.deleteUser(userID);
+                    this.$swal.fire(
+                        "Deleted!",
+                        "Your file has been deleted.",
+                        "success"
+                    );
+                }
             });
         }
     }
