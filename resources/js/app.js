@@ -26,10 +26,15 @@ Vue.use(VueProgressBar, {
 
 Vue.use(VueSweetalert2);
 
+
 let routes = [
     {
         path: "/dashboard",
         component: require("./components/Dashboard.vue").default
+    },
+    {
+        path: "/developer",
+        component: require("./components/Developer.vue").default
     },
     {
         path: "/profile",
@@ -67,6 +72,20 @@ Vue.filter("myDate", function(created) {
 Vue.component(
     "example-component",
     require("./components/ExampleComponent.vue").default
+);
+Vue.component(
+    'passport-clients',
+    require('./components/passport/Clients.vue').default
+);
+
+Vue.component(
+    'passport-authorized-clients',
+    require('./components/passport/AuthorizedClients.vue').default
+);
+
+Vue.component(
+    'passport-personal-access-tokens',
+    require('./components/passport/PersonalAccessTokens.vue').default
 );
 
 /**
