@@ -129,8 +129,28 @@
                         </div>
 
                         <div class="form-group row">
+                            <label
+                                for="inputEmail"
+                                class="col-sm-2 col-form-label"
+                                >password</label
+                            >
+                            <div class="col-sm-10">
+                                <input
+                                    v-model="form.password"
+                                    type="password"
+                                    class="form-control"
+                                    placeholder="password"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
                             <div class="offset-sm-2 col-sm-10">
-                                <button type="submit" class="btn btn-success">
+                                <button
+                                    @click.prevent="updateInfo"
+                                    type="submit"
+                                    class="btn btn-success"
+                                >
                                     Update
                                 </button>
                             </div>
@@ -153,7 +173,8 @@ export default {
                 password: "",
                 type: "",
                 bio: "",
-                photo: ""
+                photo: "",
+                password: ""
             })
         };
     },
@@ -161,6 +182,18 @@ export default {
         this.getCurrentUser();
     },
     methods: {
+        updateInfo() {
+            this.$Progress.start();
+            this.form
+                .put("api/profile")
+                .then(() => {
+                    this.$Progress.finish();
+                })
+                .catch(error => {
+                    console.log(error);
+                    this.$Progress.finish();
+                });
+        },
         getCurrentUser() {
             axios
                 .get("api/profile")
@@ -175,11 +208,20 @@ export default {
         updateProfile(e) {
             let file = e.target.files[0];
             let reader = new FileReader();
-            reader.onloadend = (file) => {
-                // console.log("result", reader.result);
-                this.form.photo = reader.result;
-            };
-            reader.readAsDataURL(file);
+
+            if (file["size"] < 2111775) {
+                reader.onloadend = file => {
+                    console.log("result", reader.result);
+                    this.form.photo = reader.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                this.$swal.fire(
+                    "Oops..",
+                    "You are uploading a large file.",
+                    "error"
+                );
+            }
         }
     }
 };

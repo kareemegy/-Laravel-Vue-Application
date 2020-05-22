@@ -2022,6 +2022,28 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2169,7 +2191,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      form: new Form({
+      form: new Form(_defineProperty({
         id: "",
         name: "",
         email: "",
@@ -2177,37 +2199,53 @@ __webpack_require__.r(__webpack_exports__);
         type: "",
         bio: "",
         photo: ""
-      })
+      }, "password", ""))
     };
   },
   created: function created() {
     this.getCurrentUser();
   },
   methods: {
-    getCurrentUser: function getCurrentUser() {
+    updateInfo: function updateInfo() {
       var _this = this;
+
+      this.$Progress.start();
+      this.form.put("api/profile").then(function () {
+        _this.$Progress.finish();
+      })["catch"](function (error) {
+        console.log(error);
+
+        _this.$Progress.finish();
+      });
+    },
+    getCurrentUser: function getCurrentUser() {
+      var _this2 = this;
 
       axios.get("api/profile").then(function (_ref) {
         var data = _ref.data;
         console.log(data);
 
-        _this.form.fill(data);
+        _this2.form.fill(data);
       })["catch"](function (error) {
         console.log(error);
       });
     },
     updateProfile: function updateProfile(e) {
-      var _this2 = this;
+      var _this3 = this;
 
       var file = e.target.files[0];
       var reader = new FileReader();
 
-      reader.onloadend = function (file) {
-        // console.log("result", reader.result);
-        _this2.form.photo = reader.result;
-      };
+      if (file["size"] < 2111775) {
+        reader.onloadend = function (file) {
+          console.log("result", reader.result);
+          _this3.form.photo = reader.result;
+        };
 
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      } else {
+        this.$swal.fire("Oops..", "You are uploading a large file.", "error");
+      }
     }
   }
 });
@@ -65012,7 +65050,63 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
-              _vm._m(1)
+              _c("div", { staticClass: "form-group row" }, [
+                _c(
+                  "label",
+                  {
+                    staticClass: "col-sm-2 col-form-label",
+                    attrs: { for: "inputEmail" }
+                  },
+                  [_vm._v("password")]
+                ),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm-10" }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.form.password,
+                        expression: "form.password"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "password", placeholder: "password" },
+                    domProps: { value: _vm.form.password },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(_vm.form, "password", $event.target.value)
+                      }
+                    }
+                  })
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group row" }, [
+                _c("div", { staticClass: "offset-sm-2 col-sm-10" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-success",
+                      attrs: { type: "submit" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          return _vm.updateInfo($event)
+                        }
+                      }
+                    },
+                    [
+                      _vm._v(
+                        "\n                                Update\n                            "
+                      )
+                    ]
+                  )
+                ])
+              ])
             ])
           ]
         )
@@ -65091,24 +65185,6 @@ var staticRenderFns = [
             ])
           ])
         ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c("div", { staticClass: "offset-sm-2 col-sm-10" }, [
-        _c(
-          "button",
-          { staticClass: "btn btn-success", attrs: { type: "submit" } },
-          [
-            _vm._v(
-              "\n                                Update\n                            "
-            )
-          ]
-        )
       ])
     ])
   }
