@@ -25,6 +25,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-if="!users.data">
+                                    <img src="img/loding.gif" alt="">
+                                </tr>
                                 <tr v-for="user in users.data" :key="user.id">
                                     <td>{{ user.id }}</td>
                                     <td>{{ user.name }}</td>
@@ -323,3 +326,8 @@ export default {
     }
 };
 </script>
+
+<style>
+
+
+</style>

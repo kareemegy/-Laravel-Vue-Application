@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 
+
 class UserController extends Controller
 {
         /**
@@ -18,6 +19,7 @@ class UserController extends Controller
     {
         $this->middleware('api');
     }
+
 
     /**
      * Display a listing of the resource.
@@ -61,7 +63,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+       
     }
 
     /**
@@ -76,7 +78,7 @@ class UserController extends Controller
 
         $this->validate($request,[
             'name' => ['required', 'string', 'max:191'],
-            'email' => ['required', 'string', 'email', 'max:191', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:191'],
         ]);
 
         $user =  User::find($id);
@@ -107,5 +109,11 @@ class UserController extends Controller
         $user =  User::find($id);
         $user->delete();
         return ["message" => "User Is Deleted"];
+    }
+
+    public function profile(){
+       
+        return auth('api')->user();
+       
     }
 }

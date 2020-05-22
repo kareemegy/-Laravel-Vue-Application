@@ -63,60 +63,75 @@
             <div class="col-md-12 p-3">
                 <div class="tab-pane active" id="settings">
                     <form class="form-horizontal">
-                      <div class="form-group row">
-                        <label for="inputName" class="col-sm-2 col-form-label">Name</label>
-                        <div class="col-sm-10">
-                          <input type="email" class="form-control" id="inputName" placeholder="Name">
+                        <div class="form-group row">
+                            <label
+                                for="inputName"
+                                class="col-sm-2 col-form-label"
+                                >Name</label
+                            >
+                            <div class="col-sm-10">
+                                <input
+                                    v-model="form.name"
+                                    type="email"
+                                    class="form-control"
+                                    id="inputName"
+                                    placeholder="Name"
+                                />
+                            </div>
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
-                        <div class="col-sm-10">
-                          <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                        <div class="form-group row">
+                            <label
+                                for="inputEmail"
+                                class="col-sm-2 col-form-label"
+                                >Email</label
+                            >
+                            <div class="col-sm-10">
+                                <input
+                                    v-model="form.email"
+                                    type="email"
+                                    class="form-control"
+                                    id="inputEmail"
+                                    placeholder="Email"
+                                />
+                            </div>
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="inputName2" class="col-sm-2 col-form-label">Name</label>
-                        <div class="col-sm-10">
-                          <input type="text" class="form-control" id="inputName2" placeholder="Name">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="inputExperience" class="col-sm-2 col-form-label">Experience</label>
-                        <div class="col-sm-10">
-                          <textarea class="form-control" id="inputExperience" placeholder="Experience"></textarea>
-                        </div>
-                      </div>
 
                         <div class="form-group row">
-                        <label for="inputExperience" class="col-sm-2 col-form-label">image</label>
-                        <div class="col-sm-10">
-                        <input type="file">
+                            <label
+                                for="inputExperience"
+                                class="col-sm-2 col-form-label"
+                                >bio</label
+                            >
+                            <div class="col-sm-10">
+                                <textarea
+                                    v-model="form.bio"
+                                    class="form-control"
+                                    id="inputExperience"
+                                    placeholder="Experience"
+                                ></textarea>
+                            </div>
                         </div>
-                      </div>
 
-                      <div class="form-group row">
-                        <label for="inputSkills" class="col-sm-2 col-form-label">Skills</label>
-                        <div class="col-sm-10">
-                          <input type="text" class="form-control" id="inputSkills" placeholder="Skills">
+                        <div class="form-group row">
+                            <label
+                                for="inputExperience"
+                                class="col-sm-2 col-form-label"
+                                >image</label
+                            >
+                            <div class="col-sm-10">
+                                <input type="file" />
+                            </div>
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <div class="offset-sm-2 col-sm-10">
-                          <div class="checkbox">
-                            <label>
-                              <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
-                            </label>
-                          </div>
+
+                        <div class="form-group row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-success">
+                                    Update
+                                </button>
+                            </div>
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <div class="offset-sm-2 col-sm-10">
-                          <button type="submit" class="btn btn-success">Submit</button>
-                        </div>
-                      </div>
                     </form>
-                  </div>
+                </div>
             </div>
         </div>
     </div>
@@ -124,12 +139,36 @@
 
 <script>
 export default {
-    mounted() {
-        console.log("Component mounted.");
+    data() {
+        return {
+            form: new Form({
+                id: "",
+                name: "",
+                email: "",
+                password: "",
+                type: "",
+                bio: "",
+                photo: ""
+            })
+        };
+    },
+    created() {
+        this.getCurrentUser();
+    },
+    methods: {
+        getCurrentUser() {
+            axios
+                .get("api/profile")
+                .then(({ data }) => {
+                    console.log(data);
+                    this.form.fill(data);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
     }
 };
 </script>
 
-<style>
-
-</style>
+<style></style>
