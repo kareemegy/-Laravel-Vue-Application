@@ -119,7 +119,12 @@
                                 >image</label
                             >
                             <div class="col-sm-10">
-                                <input type="file" />
+                                <input
+                                    type="file"
+                                    @change="updateProfile"
+                                    name="photo"
+                                    class="form-input"
+                                />
                             </div>
                         </div>
 
@@ -166,6 +171,15 @@ export default {
                 .catch(error => {
                     console.log(error);
                 });
+        },
+        updateProfile(e) {
+            let file = e.target.files[0];
+            let reader = new FileReader();
+            reader.onloadend = (file) => {
+                // console.log("result", reader.result);
+                this.form.photo = reader.result;
+            };
+            reader.readAsDataURL(file);
         }
     }
 };
