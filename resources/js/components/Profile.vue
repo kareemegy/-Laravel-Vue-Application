@@ -14,7 +14,7 @@
                     <div class="widget-user-image">
                         <img
                             class="img-circle elevation-2"
-                            src="img/user.jpg"
+                            :src="getProfilePhoto()"
                             alt="User Avatar"
                         />
                     </div>
@@ -222,6 +222,10 @@ export default {
                     "error"
                 );
             }
+        },
+        getProfilePhoto() {
+            let prefix = this.form.photo.match(/\//) ? "" : "/img/profile/";
+            return prefix + this.form.photo;
         }
     }
 };
