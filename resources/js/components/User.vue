@@ -28,7 +28,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr v-if="!users.data">
                                     <img src="img/loding.gif" alt="" />
                                 </tr>
                                 <tr v-for="user in users.data" :key="user.id">

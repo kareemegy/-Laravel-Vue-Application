@@ -10,6 +10,7 @@ import Moment from "moment";
 import VueProgressBar from "vue-progressbar";
 import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+
 import Gate from "../js/Gate";
 require("./bootstrap");
 window.Vue = require("vue");
@@ -46,6 +47,10 @@ let routes = [
     },
     {
         path: "/notFound",
+        component: require("./components/NotFound.vue").default
+    },
+    {
+        path: "*",
         component: require("./components/NotFound.vue").default
     }
 ];
@@ -88,8 +93,7 @@ Vue.component(
     require("./components/passport/PersonalAccessTokens.vue").default
 );
 
-Vue.component('pagination', require('laravel-vue-pagination'));
-
+Vue.component("pagination", require("laravel-vue-pagination"));
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

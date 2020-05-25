@@ -65851,7 +65851,11 @@ var render = function() {
               _c(
                 "tbody",
                 [
-                  _vm._m(1),
+                  !_vm.users.data
+                    ? _c("tr", [
+                        _c("img", { attrs: { src: "img/loding.gif", alt: "" } })
+                      ])
+                    : _vm._e(),
                   _vm._v(" "),
                   _vm._l(_vm.users.data, function(user) {
                     return _c("tr", { key: user.id }, [
@@ -65951,7 +65955,7 @@ var render = function() {
                   }
                 }),
                 _vm._v(" "),
-                _vm._m(2)
+                _vm._m(1)
               ]),
               _vm._v(" "),
               _c(
@@ -66257,12 +66261,6 @@ var staticRenderFns = [
         _c("th", [_vm._v("bio")])
       ])
     ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("tr", [_c("img", { attrs: { src: "img/loding.gif", alt: "" } })])
   },
   function() {
     var _vm = this
@@ -82772,6 +82770,9 @@ var routes = [{
 }, {
   path: "/notFound",
   component: __webpack_require__(/*! ./components/NotFound.vue */ "./resources/js/components/NotFound.vue")["default"]
+}, {
+  path: "*",
+  component: __webpack_require__(/*! ./components/NotFound.vue */ "./resources/js/components/NotFound.vue")["default"]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
   mode: "history",
@@ -82797,7 +82798,7 @@ Vue.filter("myDate", function (created) {
 Vue.component("passport-clients", __webpack_require__(/*! ./components/passport/Clients.vue */ "./resources/js/components/passport/Clients.vue")["default"]);
 Vue.component("passport-authorized-clients", __webpack_require__(/*! ./components/passport/AuthorizedClients.vue */ "./resources/js/components/passport/AuthorizedClients.vue")["default"]);
 Vue.component("passport-personal-access-tokens", __webpack_require__(/*! ./components/passport/PersonalAccessTokens.vue */ "./resources/js/components/passport/PersonalAccessTokens.vue")["default"]);
-Vue.component('pagination', __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
+Vue.component("pagination", __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
