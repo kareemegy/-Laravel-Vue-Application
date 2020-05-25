@@ -63,7 +63,6 @@
                             :data="users"
                             @pagination-change-page="getResults"
                         >
-                         
                         </pagination>
                     </div>
                 </div>
@@ -240,6 +239,19 @@ export default {
     },
     created() {
         this.loadUsers();
+        console.log(this.$data.search);
+        Fire.$on("searching", () => {
+            let query = this.$parent.search;
+            axios
+                .get("api/finduser?q=" + query)
+                .then(data => {
+                    console.log(data.data);
+                    this.users = data.data;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        });
     },
     mounted() {
         // Fetch initial results

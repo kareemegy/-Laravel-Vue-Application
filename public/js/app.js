@@ -2476,7 +2476,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2495,7 +2494,19 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   created: function created() {
+    var _this = this;
+
     this.loadUsers();
+    console.log(this.$data.search);
+    Fire.$on("searching", function () {
+      var query = _this.$parent.search;
+      axios.get("api/finduser?q=" + query).then(function (data) {
+        console.log(data.data);
+        _this.users = data.data;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    });
   },
   mounted: function mounted() {
     // Fetch initial results
@@ -2503,11 +2514,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     getResults: function getResults() {
-      var _this = this;
+      var _this2 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       axios.get("api/user?page=" + page).then(function (response) {
-        _this.users = response.data;
+        _this2.users = response.data;
       });
     },
     editUserModal: function editUserModal(user) {
@@ -2529,70 +2540,70 @@ __webpack_require__.r(__webpack_exports__);
       this.form.clear();
     },
     createUser: function createUser() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.$Progress.start();
       this.form.post("api/user").then(function () {
         $("#usermodal").modal("hide");
 
-        _this2.loadUsers();
-
-        _this2.reset();
-
-        _this2.$Progress.finish();
-
-        _this2.showUserToast("user is created");
-      })["catch"](function () {
-        _this2.$Progress.finish();
-      });
-    },
-    editUser: function editUser(editUserID) {
-      var _this3 = this;
-
-      this.$Progress.start();
-      this.form.put("api/user/".concat(editUserID)).then(function (res) {
-        console.log(res);
-
         _this3.loadUsers();
-
-        $("#usermodal").modal("hide");
 
         _this3.reset();
 
         _this3.$Progress.finish();
 
-        _this3.showUserToast("user is edited");
-      })["catch"](function (error) {
-        console.log(error);
-
+        _this3.showUserToast("user is created");
+      })["catch"](function () {
         _this3.$Progress.finish();
       });
     },
-    loadUsers: function loadUsers() {
+    editUser: function editUser(editUserID) {
       var _this4 = this;
+
+      this.$Progress.start();
+      this.form.put("api/user/".concat(editUserID)).then(function (res) {
+        console.log(res);
+
+        _this4.loadUsers();
+
+        $("#usermodal").modal("hide");
+
+        _this4.reset();
+
+        _this4.$Progress.finish();
+
+        _this4.showUserToast("user is edited");
+      })["catch"](function (error) {
+        console.log(error);
+
+        _this4.$Progress.finish();
+      });
+    },
+    loadUsers: function loadUsers() {
+      var _this5 = this;
 
       if (this.$gate.isAdmin() || this.$gate.isAuthor()) {
         axios.get("api/user").then(function (data) {
-          _this4.users = data.data;
+          _this5.users = data.data;
         });
       } else {
         this.$router.push("/notFound");
       }
     },
     deleteUser: function deleteUser(userID) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.$Progress.start();
       axios["delete"]("api/user/".concat(userID)).then(function (res) {
         console.log(res);
 
-        _this5.loadUsers();
+        _this6.loadUsers();
 
-        _this5.$Progress.finish();
+        _this6.$Progress.finish();
       })["catch"](function (erro) {
         console.log(erro);
 
-        _this5.$Progress.finish();
+        _this6.$Progress.finish();
       });
     },
     showUserToast: function showUserToast(text) {
@@ -2607,7 +2618,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     deleteUserAlert: function deleteUserAlert(userID) {
-      var _this6 = this;
+      var _this7 = this;
 
       this.$swal({
         title: "Are you sure?",
@@ -2619,9 +2630,9 @@ __webpack_require__.r(__webpack_exports__);
         confirmButtonText: "Yes, delete it!"
       }).then(function (result) {
         if (result.value) {
-          _this6.deleteUser(userID);
+          _this7.deleteUser(userID);
 
-          _this6.$swal.fire("Deleted!", "Your file has been deleted.", "success");
+          _this7.$swal.fire("Deleted!", "Your file has been deleted.", "success");
         }
       });
     }
@@ -82799,6 +82810,7 @@ Vue.component("passport-clients", __webpack_require__(/*! ./components/passport/
 Vue.component("passport-authorized-clients", __webpack_require__(/*! ./components/passport/AuthorizedClients.vue */ "./resources/js/components/passport/AuthorizedClients.vue")["default"]);
 Vue.component("passport-personal-access-tokens", __webpack_require__(/*! ./components/passport/PersonalAccessTokens.vue */ "./resources/js/components/passport/PersonalAccessTokens.vue")["default"]);
 Vue.component("pagination", __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
+window.Fire = new Vue();
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -82807,7 +82819,15 @@ Vue.component("pagination", __webpack_require__(/*! laravel-vue-pagination */ ".
 
 var app = new Vue({
   el: "#app",
-  router: router
+  router: router,
+  data: {
+    search: ""
+  },
+  methods: {
+    searchit: _.debounce(function () {
+      Fire.$emit("searching");
+    }, 1000)
+  }
 });
 
 /***/ }),

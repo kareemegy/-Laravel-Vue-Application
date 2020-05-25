@@ -158,4 +158,29 @@ class UserController extends Controller
       return ['msg'=>' Success'];
 
     }
+
+public function findUser(Request $request)
+{
+//   if( $search = $request->q){
+//         $users = \DB::table('users')
+//             ->paginate(2);
+//             ->where('name', 'like', "%$search%")
+//             ->orWhere('email','like',"%$search%")
+//             ->get()
+
+//             return  $users ;
+//     }
+
+        if ($search = \Request::get('q')) {
+            $users = User::where(function($query) use ($search){
+                $query->where('name','LIKE',"%$search%")
+                        ->orWhere('email','LIKE',"%$search%");
+            })->paginate(20);
+        }else{
+            $users = User::latest()->paginate(5);
+        }
+
+        return $users;
+   
+}
 }
