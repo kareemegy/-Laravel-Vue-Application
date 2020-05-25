@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('api');
+        $this->middleware('auth:api');
     }
 
 
@@ -28,7 +28,16 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::latest()->paginate(10);
+        // $this->authorize('isAdmin');
+        
+        // if (\Gate::allows('isAdmin') || \Gate::allows('isAuthor') ) {
+
+        //     return User::latest()->paginate(10);
+        // }
+        if (\Gate::any(['isAdmin', 'isAuthor']) ) {
+
+            return User::latest()->paginate(2);
+        }
     }
 
     /**
@@ -106,7 +115,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user =  User::find($id);
+        $this->authorize('isAdmin');
+        $user =  User::findOrFail($id);
         $user->delete();
         return ["message" => "User Is Deleted"];
     }

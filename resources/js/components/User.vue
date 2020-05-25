@@ -6,7 +6,10 @@
                     <div class="card-header">
                         <h3 class="card-title">Users Table</h3>
                         <div class="card-tools">
-                            <button class="btn btn-success" @click="createUserModal">
+                            <button
+                                class="btn btn-success"
+                                @click="createUserModal"
+                            >
                                 Add New <i class="fa fa-user-plus fa-fw"></i>
                             </button>
                         </div>
@@ -25,8 +28,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-if="!users.data">
-                                    <img src="img/loding.gif" alt="">
+                                <tr>
+                                    <img src="img/loding.gif" alt="" />
                                 </tr>
                                 <tr v-for="user in users.data" :key="user.id">
                                     <td>{{ user.id }}</td>
@@ -36,7 +39,10 @@
                                     <td>{{ user.created_at | myDate }}</td>
                                     <td>{{ user.bio }}</td>
                                     <td>
-                                        <a href="#" @click="editUserModal(user)">
+                                        <a
+                                            href="#"
+                                            @click="editUserModal(user)"
+                                        >
                                             <i class="fa fa-edit blue"></i>
                                         </a>
                                         <a
@@ -51,6 +57,15 @@
                         </table>
                     </div>
                     <!-- /.card-body -->
+                    <div class="card-footer">
+                        <pagination
+                            :show-disabled="false"
+                            :data="users"
+                            @pagination-change-page="getResults"
+                        >
+                         
+                        </pagination>
+                    </div>
                 </div>
                 <!-- /.card -->
             </div>
@@ -189,7 +204,11 @@
 
                             <button
                                 type="submit"
-                                :class="editmode ?' btn btn-success':' btn btn-primary'"
+                                :class="
+                                    editmode
+                                        ? ' btn btn-success'
+                                        : ' btn btn-primary'
+                                "
                                 v-text="editmode ? 'Update' : 'Create'"
                             ></button>
                         </div>
@@ -219,10 +238,19 @@ export default {
             })
         };
     },
-    created() { 
+    created() {
         this.loadUsers();
     },
+    mounted() {
+        // Fetch initial results
+        this.getResults();
+    },
     methods: {
+        getResults(page = 1) {
+            axios.get("api/user?page=" + page).then(response => {
+                this.users = response.data;
+            });
+        },
         editUserModal(user) {
             this.editmode = true;
             this.reset();
@@ -274,9 +302,13 @@ export default {
                 });
         },
         loadUsers() {
-            axios.get("api/user").then(data => {
-                this.users = data.data;
-            });
+            if (this.$gate.isAdmin() || this.$gate.isAuthor()) {
+                axios.get("api/user").then(data => {
+                    this.users = data.data;
+                });
+            } else {
+                this.$router.push("/notFound");
+            }
         },
         deleteUser(userID) {
             this.$Progress.start();
@@ -327,7 +359,4 @@ export default {
 };
 </script>
 
-<style>
-
-
-</style>
+<style></style>
